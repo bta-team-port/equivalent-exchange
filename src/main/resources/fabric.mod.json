@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "ee",
   "version": "${version}",
 
-  "name": "Example Mod",
+  "name": "Equivalent Exchange",
   "description": "This mod aims to help new BTA modders.",
   "authors": [
-    "Turnip Labs"
+    "TeamPort",
+		"x3n0ph0b3 (original creator)"
   ],
   "contact": {
     "homepage": "",
@@ -19,20 +20,26 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-			"turniplabs.examplemod.ExampleMod"
+      "teamport.ee.EquivalentExchange"
     ],
 		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+          "teamport.ee.EquivalentExchange"
 		],
 		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+          "teamport.ee.EquivalentExchange"
+		],
+		"beforeClientStart": [
+			"teamport.ee.EquivalentExchange"
+		],
+		"afterClientStart": [
+			"teamport.ee.EquivalentExchange"
 		],
 		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+			"teamport.ee.EERecipes"
 		]
 	},
   "mixins": [
-      "examplemod.mixins.json"
+		"ee.mixins.json"
   ],
 
   "depends": {
