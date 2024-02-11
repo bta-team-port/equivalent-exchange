@@ -23,10 +23,10 @@
       "teamport.ee.EquivalentExchange"
     ],
 		"beforeGameStart": [
-          "teamport.ee.EquivalentExchange"
+			"teamport.ee.EquivalentExchange"
 		],
 		"afterGameStart": [
-          "teamport.ee.EquivalentExchange"
+			"teamport.ee.EquivalentExchange"
 		],
 		"beforeClientStart": [
 			"teamport.ee.EquivalentExchange"
