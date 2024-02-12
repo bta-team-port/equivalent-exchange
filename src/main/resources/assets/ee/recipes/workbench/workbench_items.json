@@ -1,0 +1,142 @@
+[
+  {
+    "name": "equivalent:workbench/philosophers_stone",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "121",
+      "232",
+      "121"
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.dust.glowstone",
+          "amount": 4,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.dust.redstone",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "3",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.stone.philosophers",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "111",
+      "121",
+      "111"
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.aeternaliscoal",
+          "amount": 8,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "tile.block.diamond",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.matter.dark",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/red_matter",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "111",
+      "222",
+      "111"
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.aeternaliscoal",
+          "amount": 6,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.matter.red",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "121",
+      " 2 ",
+      " 2 "
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.hammer.darkmatter",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  }
+]

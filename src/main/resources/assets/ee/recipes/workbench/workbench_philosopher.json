@@ -1,5 +1,295 @@
 [
   {
+    "name": "equivalent:workbench/philosophers_charcoal_to_coal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 1
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 1
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 1
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 1
+        }
+      }
+    ],
+    "result": {
+      "key": "item.coal",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_coal_to_charcoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.coal",
+      "amount": 4,
+      "meta": 1
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_coal_to_nethercoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.coal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.nethercoal",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_nethercoal_to_coal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.nethercoal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.coal",
+      "amount": 4,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_nethercoal_to_mobiuscoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.nethercoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.nethercoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.nethercoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.nethercoal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.mobiuscoal",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_mobiuscoal_to_nethercoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.mobiuscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.nethercoal",
+      "amount": 4,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
 
+  {
+    "name": "equivalent:workbench/philosophers_mobiuscoal_to_aeternaliscoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.mobiuscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.mobiuscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.mobiuscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.mobiuscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.aeternaliscoal",
+      "amount": 1,
+      "meta": 0
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/philosophers_aeternaliscoal_to_mobiuscoal",
+    "type": "minecraft:crafting/shapeless",
+    "inputs": [
+      {
+        "stack": {
+          "key": "item.ee.stone.philosophers",
+          "amount": 1,
+          "meta": 0
+        }
+      },
+      {
+        "stack": {
+          "key": "item.ee.aeternaliscoal",
+          "amount": 1,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.mobiuscoal",
+      "amount": 4,
+      "meta": 0
+    },
+    "consumeContainers": false
   }
 ]
