@@ -15,11 +15,13 @@ public class ItemPhilosophersStone extends Item {
 
 	public ItemPhilosophersStone(String name, int id) {
 		super(name, id);
+		setMaxStackSize(1);
+		setContainerItem(this);
 	}
 
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
-		// These two are simple. First one checks the world block that the player is targeting.
+		// These two are simple. First one checks the block that the player is targeting.
 		// The second one checks and gets the targeted block's return value from the hashmap.
 		Block blockToGet = world.getBlock(blockX, blockY, blockZ);
 		Block blockToPlace = transmutations.get(blockToGet);
@@ -27,12 +29,12 @@ public class ItemPhilosophersStone extends Item {
 		// Now check if the targeted block isn't null.
 		// Also add a delay for when the player is swinging else the sound will clip horrifically.
 		if (blockToGet != null && !player.isSwinging) {
-			// Play the sound first before any 'server-side' calls.
-			world.playSoundAtEntity(player, "ee.transmute", 0.7f, 1.0f);
 
-			// Then check if it contains the targeted block's key. If so place the targeted block's map buddy.
-			// Otherwise, if it's a colored meta block increase metadata.
+			// Then check if the map contains the targeted block's key. If so place the block's value.
+			// Otherwise, if it's a colored block increase metadata.
 			if (transmutations.containsKey(blockToGet)) {
+				// Play the sound first before any 'server-side' calls.
+				world.playSoundAtEntity(player, "ee.transmute", 0.7f, 1.0f);
 
 				if (!world.isClientSide) {
 					world.setBlockWithNotify(blockX, blockY, blockZ, blockToPlace.id);
@@ -42,6 +44,8 @@ public class ItemPhilosophersStone extends Item {
 				}
 			} else {
 				if (blockToGet == Block.planksOakPainted || blockToGet == Block.wool || blockToGet == Block.lampIdle || blockToGet == Block.lampActive) {
+					world.playSoundAtEntity(player, "ee.transmute", 0.7f, 1.0f);
+
 					if (!world.isClientSide) {
 						// Get the plank/wool/lamp's metadata first.
 						int meta = world.getBlockMetadata(blockX, blockY, blockZ);
@@ -120,7 +124,8 @@ public class ItemPhilosophersStone extends Item {
 
 		// Tall grass
 		transmutations.put(Block.tallgrass, Block.tallgrassFern);
-		transmutations.put(Block.tallgrassFern, Block.tallgrass);
+		transmutations.put(Block.tallgrassFern, Block.spinifex);
+		transmutations.put(Block.spinifex, Block.tallgrass);
 
 		// Flowers
 		transmutations.put(Block.flowerRed, Block.flowerYellow);

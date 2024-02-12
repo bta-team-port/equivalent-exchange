@@ -1,7 +1,25 @@
 item.ee.stone.philosophers.name=Philosophers Stone
 item.ee.stone.philosophers.desc=
 
+item.ee.mobiuscoal.name=Mobius Coal
+item.ee.mobiuscoal.desc=
+item.ee.aeternaliscoal.name=Aeternalis Coal
+item.ee.aeternaliscoal.desc=
+
 item.ee.matter.dark.name=Dark Matter
 item.ee.matter.dark.desc=
 item.ee.matter.red.name=Red Matter
 item.ee.matter.red.desc=
+
+item.ee.tool.sword.darkmatter.name=Dark Matter Sword
+item.ee.tool.sword.darkmatter.desc=
+item.ee.tool.shovel.darkmatter.name=Dark Matter Shovel
+item.ee.tool.shovel.darkmatter.desc=
+item.ee.tool.pickaxe.darkmatter.name=Dark Matter Pickaxe
+item.ee.tool.pickaxe.darkmatter.desc=
+item.ee.tool.axe.darkmatter.name=Dark Matter Axe
+item.ee.tool.axe.darkmatter.desc=
+item.ee.tool.hoe.darkmatter.name=Dark Matter Hoe
+item.ee.tool.hoe.darkmatter.desc=
+item.ee.tool.hammer.darkmatter.name=Dark Matter Hammer
+item.ee.tool.hammer.darkmatter.desc=
