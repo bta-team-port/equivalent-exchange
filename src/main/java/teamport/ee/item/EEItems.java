@@ -1,10 +1,10 @@
 package teamport.ee.item;
 
 import net.minecraft.core.item.Item;
-import net.minecraft.core.item.ItemToolShears;
 import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.*;
 import teamport.ee.EEConfig;
+import teamport.ee.item.tools.ItemToolHammer;
 import turniplabs.halplibe.helper.ItemHelper;
 
 import static teamport.ee.EquivalentExchange.MOD_ID;
