@@ -1,6 +1,11 @@
 package teamport.ee;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.client.gui.options.components.KeyBindingComponent;
+import net.minecraft.client.gui.options.components.OptionsCategory;
+import net.minecraft.client.gui.options.data.OptionsPages;
+import net.minecraft.client.option.KeyBinding;
+import org.lwjgl.input.Keyboard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import teamport.ee.block.EEBlocks;
@@ -13,6 +18,8 @@ import turniplabs.halplibe.util.GameStartEntrypoint;
 public class EquivalentExchange implements ModInitializer, GameStartEntrypoint, ClientStartEntrypoint {
     public static final String MOD_ID = "ee";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final KeyBinding keyChangeMode = new KeyBinding("ee.key.changemode").bindKeyboard(Keyboard.KEY_B);
+	public static final KeyBinding keyCharge = new KeyBinding("ee.key.charge").bindKeyboard(Keyboard.KEY_V);
 
     @Override
     public void onInitialize() {
@@ -51,6 +58,9 @@ public class EquivalentExchange implements ModInitializer, GameStartEntrypoint, 
 
 	@Override
 	public void afterClientStart() {
-
+		OptionsPages.CONTROLS.withComponent(
+			new OptionsCategory("ee.category")
+				.withComponent(new KeyBindingComponent(keyChangeMode))
+		);
 	}
 }
