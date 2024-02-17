@@ -6,6 +6,9 @@ import teamport.ee.EquivalentExchange;
 import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface IToolMatter {
 	FuelEMC fuel = new FuelEMC();
 
@@ -16,21 +19,30 @@ public interface IToolMatter {
 	// Finally, consume fuel then return true.
 	default boolean canUseItem(int countedBlocks, EntityPlayer player) {
 		if (player != null) {
+			int cumulativeFuel = 0;
+			List<Integer> indices = new ArrayList<>();
 			for (int i = 0; i < player.inventory.mainInventory.length; i++) {
 				ItemStack stack = player.inventory.getStackInSlot(i);
 				if (stack != null && fuel.getFuelList().containsKey(stack.getItem().id)) {
-					if (fuel.getYield(stack.itemID) >= countedBlocks || stack.stackSize > countedBlocks) {
+					cumulativeFuel += fuel.getYield(stack.itemID) * stack.stackSize;
+					indices.add(i);
+					if (cumulativeFuel >= countedBlocks) break;
+				}
+			}
+			if (cumulativeFuel >= countedBlocks){
+				int usedFuel = 0;
+				for (Integer i : indices){
+					ItemStack stack = player.inventory.getStackInSlot(i);
+					while (stack.stackSize > 0 && usedFuel < countedBlocks){
+						usedFuel += fuel.getYield(stack.itemID);
 						stack.consumeItem(player);
-						EquivalentExchange.LOGGER.info("Block count is " + countedBlocks);
-
-						// Error prevention method for stack sizes below 0.
-						if (stack.stackSize <= 0) {
-							player.inventory.mainInventory[i] = null;
-						}
-
-						return true;
+					}
+					if (stack.stackSize <= 0){
+						player.inventory.mainInventory[i] = null;
 					}
 				}
+				player.addChatMessage("Block count is " + countedBlocks);
+				return true;
 			}
 		}
 		return false;
