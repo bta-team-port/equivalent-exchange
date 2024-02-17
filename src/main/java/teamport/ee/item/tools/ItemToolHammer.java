@@ -10,14 +10,13 @@ import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.ItemToolPickaxe;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
-import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 import teamport.ee.miscallaneous.math.MathHelper;
 
 public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
-	private final FuelEMC fuel = new FuelEMC();
+	private int blockCount;
 
 	public ItemToolHammer(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);
@@ -100,9 +99,6 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
-		// Block counter so we can detect how much fuel to use.
-		int blockCount = 0;
-
 		// First check if there's a targeted block exists and is mine-able.
 		// If it exists then play the 'destruct' sound.
 		if (world.getBlock(blockX, blockY, blockZ) != null && world.getBlock(blockX, blockY, blockZ).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
