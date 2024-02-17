@@ -16,7 +16,6 @@ import teamport.ee.miscallaneous.math.MathHelper;
 
 public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
-	private int blockCount;
 
 	public ItemToolHammer(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);
@@ -105,9 +104,9 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 			world.playSoundAtEntity(entityplayer, "ee.destruct", 0.7f, 1.0f);
 		}
 		if (!world.isClientSide) {
+			int blockCount = 0;
 			float wrapY = MathHelper.wrapDegrees(Math.round(entityplayer.yRot));
 			float xRot = entityplayer.xRot % 360;
-
 			if (itemstack.getMetadata() == 1) {
 				if (xRot < 60 && xRot > -60) {
 					// North
@@ -287,6 +286,7 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 						}
 					}
 				}
+				canUseItem(blockCount, entityplayer);
 				return true;
 			}
 		}
