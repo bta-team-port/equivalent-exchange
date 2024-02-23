@@ -187,6 +187,18 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 			blockCount = 0;
 			block = world.getBlock(x, y, z);
 
+			final Runnable countBlocks = () -> { // Function for if block should be counted
+				if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+					++blockCount;
+				}
+			};
+			final Runnable breakBlocks = () -> { // Function for if block should be broken
+				block = world.getBlock(x, y, z);
+				if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block.getHardness() >= 0) {
+					dropItems(world, player, x, y, z);
+				}
+			};
+
 			// Player rotations.
 			float wrapY = MathHelper.wrapDegrees(Math.round(player.yRot));
 			float xRot = player.xRot % 360;
@@ -196,110 +208,56 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 				if (xRot < 60 && xRot > -60) {
 					// North
 					if ((wrapY >= 135 && wrapY < 225)) {
-						mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
-							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								++blockCount;
-								block = world.getBlock(x, y, z);
-							}
-						});
+						mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
 					}
 					// East
 					else if (wrapY >= 225 && wrapY < 315) {
-						mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
-							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								++blockCount;
-								block = world.getBlock(x, y, z);
-							}
-						});
+						mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
 					}
 					// South
 					else if (wrapY >= 315 || wrapY < 45) {
-						mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
-							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								++blockCount;
-								block = world.getBlock(x, y, z);
-							}
-						});
+						mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
 					}
 					// West
 					else if (wrapY >= 45 && wrapY < 135) {
-						mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
-							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								++blockCount;
-								block = world.getBlock(x, y, z);
-							}
-						});
+						mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
 					}
 				}
 				// Up
 				else if (xRot <= -45) {
-					mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
-						if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						}
-					});
+					mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, countBlocks);
 				}
 				// Down
 				else if (xRot >= 45) {
-					mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
-						if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						}
-					});
+					mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, countBlocks);
 				}
 
 				if (canUseItem(blockCount, player)) {
 					if (xRot < 60 && xRot > -60) {
 						// North
 						if ((wrapY >= 135 && wrapY < 225)) {
-							mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
 						}
 						// East
 						else if (wrapY >= 225 && wrapY < 315) {
-							mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
 						}
 						// South
 						else if (wrapY >= 315 || wrapY < 45) {
-							mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
 						}
 						// West
 						else if (wrapY >= 45 && wrapY < 135) {
-							mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
 						}
 					}
 					// Up
 					else if (xRot <= -45) {
-						mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								dropItems(world, player, x, y, z);
-							}
-						});
+						mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, breakBlocks);
 					}
 					// Down
 					else if (xRot >= 45) {
-						mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-								dropItems(world, player, x, y, z);
-							}
-						});
+						mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, breakBlocks);
 					}
 				}
 				return true;
@@ -309,97 +267,55 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 				if (xRot < 60 && xRot > -60) {
 					// North
 					if ((wrapY >= 135 && wrapY < 225)) {
-						mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						});
+						mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
 					}
 					// East
 					else if (wrapY >= 225 && wrapY < 315) {
-						mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						});
+						mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
 					}
 					// South
 					else if (wrapY >= 315 || wrapY < 45) {
-						mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						});
+						mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
 					}
 					// West
 					else if (wrapY >= 45 && wrapY < 135) {
-						mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
-							++blockCount;
-							block = world.getBlock(x, y, z);
-						});
+						mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
 					}
 				}
 				// Up
 				else if (xRot <= -45) {
-					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
-						++blockCount;
-						block = world.getBlock(x, y, z);
-					});
+					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
 				}
 				// Down
 				else if (xRot >= 45) {
-					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
-						++blockCount;
-						block = world.getBlock(x, y, z);
-					});
+					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
 				}
 				if (canUseItem(blockCount, player)) {
 					if (xRot < 60 && xRot > -60) {
 						// North
 						if ((wrapY >= 135 && wrapY < 225)) {
-							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
 						}
 						// East
 						else if (wrapY >= 225 && wrapY < 315) {
-							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
 						}
 						// South
 						else if (wrapY >= 315 || wrapY < 45) {
-							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
 						}
 						// West
 						else if (wrapY >= 45 && wrapY < 135) {
-							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, player, x, y, z);
-								}
-							});
+							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
 						}
 					}
 					// Up
 					else if (xRot <= -45) {
-						mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-								dropItems(world, player, x, y, z);
-							}
-						});
+						mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
 					}
 					// Down
 					else if (xRot >= 45) {
-						mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-								dropItems(world, player, x, y, z);
-							}
-						});
+						mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
 					}
 				}
 				return true;
