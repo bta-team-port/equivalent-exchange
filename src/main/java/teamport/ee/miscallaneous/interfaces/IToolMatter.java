@@ -2,7 +2,6 @@ package teamport.ee.miscallaneous.interfaces;
 
 import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.item.ItemStack;
-import teamport.ee.EquivalentExchange;
 import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 
@@ -29,9 +28,9 @@ public interface IToolMatter {
 					if (cumulativeFuel >= countedBlocks) break;
 				}
 			}
-			if (cumulativeFuel >= countedBlocks){
+			if (cumulativeFuel >= countedBlocks) {
 				int usedFuel = 0;
-				for (Integer i : indices){
+				for (Integer i : indices) {
 					ItemStack stack = player.inventory.getStackInSlot(i);
 					while (stack.stackSize > 0 && usedFuel < countedBlocks){
 						usedFuel += fuel.getYield(stack.itemID);
