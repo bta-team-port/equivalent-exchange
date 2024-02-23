@@ -28,7 +28,7 @@ public interface IToolMatter {
 					if (cumulativeFuel >= countedBlocks) break;
 				}
 			}
-			if (cumulativeFuel >= countedBlocks) {
+			if (cumulativeFuel >= countedBlocks || !player.gamemode.consumeBlocks()) {
 				int usedFuel = 0;
 				for (Integer i : indices) {
 					ItemStack stack = player.inventory.getStackInSlot(i);
