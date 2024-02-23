@@ -8,6 +8,7 @@ import net.minecraft.core.enums.EnumDropCause;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.ItemToolPickaxe;
+import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
@@ -20,6 +21,7 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	private int y = 0;
 	private int z = 0;
 	private int blockCount;
+	private int vertical;
 	private Block block;
 
 	public ItemToolHammer(String name, int id, ToolMaterial enumtoolmaterial) {
@@ -187,76 +189,78 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 			blockCount = 0;
 			block = world.getBlock(x, y, z);
 
-			final Runnable countBlocks = () -> { // Function for if block should be counted
+			// Runnable values, so we don't have to paste over and over again!
+			// The first function is when to count blocks. The second is when to break them.
+			final Runnable countBlocks = () -> {
 				if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
 					++blockCount;
 				}
 			};
-			final Runnable breakBlocks = () -> { // Function for if block should be broken
+			final Runnable breakBlocks = () -> {
 				block = world.getBlock(x, y, z);
 				if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block.getHardness() >= 0) {
 					dropItems(world, player, x, y, z);
 				}
 			};
 
-			// Player rotations.
-			float wrapY = MathHelper.wrapDegrees(Math.round(player.yRot));
+			// Player rotation values. These are used in the switch statements below.
+			// X rotation (up and down) needs to be manually detected due to a lack of 'middle' in the Enum.
+			Direction playerDirHorizontal = Direction.getHorizontalDirection(player);
 			float xRot = player.xRot % 360;
+
+			// 0 - middle
+			// 1 - up
+			// 2 - down
+			if (xRot < 60 && xRot > -60) vertical = 0;
+			else if (xRot <= -45) vertical = 1;
+			else if (xRot >= 45) vertical = 2;
 
 			// Metadata 1 (half-charge)
 			if (itemstack.getMetadata() == 1) {
-				if (xRot < 60 && xRot > -60) {
-					// North
-					if ((wrapY >= 135 && wrapY < 225)) {
-						mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
+				if (vertical == 0) {
+					switch (playerDirHorizontal) {
+						default:
+						case NONE:
+						case NORTH:
+							mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
+							break;
+						case EAST:
+							mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
+							break;
+						case SOUTH:
+							mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
+							break;
+						case WEST:
+							mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
+							break;
 					}
-					// East
-					else if (wrapY >= 225 && wrapY < 315) {
-						mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
-					}
-					// South
-					else if (wrapY >= 315 || wrapY < 45) {
-						mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, countBlocks);
-					}
-					// West
-					else if (wrapY >= 45 && wrapY < 135) {
-						mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, countBlocks);
-					}
-				}
-				// Up
-				else if (xRot <= -45) {
+				} else if (vertical == 1) {
 					mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, countBlocks);
-				}
-				// Down
-				else if (xRot >= 45) {
+				} else if (vertical == 2) {
 					mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, countBlocks);
 				}
 
 				if (canUseItem(blockCount, player)) {
-					if (xRot < 60 && xRot > -60) {
-						// North
-						if ((wrapY >= 135 && wrapY < 225)) {
-							mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
+					if (vertical == 0) {
+						switch (playerDirHorizontal) {
+							default:
+							case NONE:
+							case NORTH:
+								mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
+								break;
+							case EAST:
+								mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
+								break;
+							case SOUTH:
+								mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
+								break;
+							case WEST:
+								mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
+								break;
 						}
-						// East
-						else if (wrapY >= 225 && wrapY < 315) {
-							mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
-						}
-						// South
-						else if (wrapY >= 315 || wrapY < 45) {
-							mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, breakBlocks);
-						}
-						// West
-						else if (wrapY >= 45 && wrapY < 135) {
-							mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, breakBlocks);
-						}
-					}
-					// Up
-					else if (xRot <= -45) {
+					} else if (vertical == 1) {
 						mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, breakBlocks);
-					}
-					// Down
-					else if (xRot >= 45) {
+					} else if (vertical == 2) {
 						mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, breakBlocks);
 					}
 				}
@@ -264,62 +268,55 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 			}
 			// Metadata 0 (full charge)
 			else if (itemstack.getMetadata() == 0) {
-				if (xRot < 60 && xRot > -60) {
-					// North
-					if ((wrapY >= 135 && wrapY < 225)) {
-						mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
+				if (vertical == 0) {
+					switch (playerDirHorizontal) {
+						default:
+						case NONE:
+						case NORTH:
+							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
+							break;
+						case EAST:
+							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
+							break;
+						case SOUTH:
+							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
+							break;
+						case WEST:
+							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
+							break;
 					}
-					// East
-					else if (wrapY >= 225 && wrapY < 315) {
-						mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
-					}
-					// South
-					else if (wrapY >= 315 || wrapY < 45) {
-						mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, countBlocks);
-					}
-					// West
-					else if (wrapY >= 45 && wrapY < 135) {
-						mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, countBlocks);
-					}
-				}
-				// Up
-				else if (xRot <= -45) {
+				} else if (vertical == 1) {
 					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
-				}
-				// Down
-				else if (xRot >= 45) {
+				} else if (vertical == 2) {
 					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
 				}
-				if (canUseItem(blockCount, player)) {
-					if (xRot < 60 && xRot > -60) {
-						// North
-						if ((wrapY >= 135 && wrapY < 225)) {
-							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
-						}
-						// East
-						else if (wrapY >= 225 && wrapY < 315) {
-							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
-						}
-						// South
-						else if (wrapY >= 315 || wrapY < 45) {
-							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
-						}
-						// West
-						else if (wrapY >= 45 && wrapY < 135) {
-							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
-						}
-					}
-					// Up
-					else if (xRot <= -45) {
-						mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
-					}
-					// Down
-					else if (xRot >= 45) {
-						mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
-					}
-				}
-				return true;
 			}
+
+			if (canUseItem(blockCount, player)) {
+				if (vertical == 0) {
+					switch (playerDirHorizontal) {
+						default:
+						case NONE:
+						case NORTH:
+							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
+							break;
+						case EAST:
+							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
+							break;
+						case SOUTH:
+							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
+							break;
+						case WEST:
+							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
+							break;
+					}
+				} else if (vertical == 1) {
+					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
+				} else if (vertical == 2) {
+					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
+				}
+			}
+			return true;
 		}
 		return false;
 	}
