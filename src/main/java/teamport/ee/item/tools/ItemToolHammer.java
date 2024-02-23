@@ -10,14 +10,17 @@ import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.ItemToolPickaxe;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
-import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 import teamport.ee.miscallaneous.math.MathHelper;
 
 public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
-	private final FuelEMC fuel = new FuelEMC();
+	private int x = 0;
+	private int y = 0;
+	private int z = 0;
+	private int blockCount;
+	private Block block;
 
 	public ItemToolHammer(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);
@@ -27,13 +30,15 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 
 	// A separate function to drop the items, so we don't have to paste it over and over again.
 	private void dropItems(World world, EntityPlayer entityPlayer, int x, int y, int z) {
-		ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-		world.setBlockWithNotify(x, y, z, 0);
+		if (world.getBlock(x, y, z) != null) {
+			ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+			world.setBlockWithNotify(x, y, z, 0);
 
-		if (entityPlayer.getGamemode().consumeBlocks()) {
-			if (stacks != null) {
-				for (ItemStack stack : stacks) {
-					world.dropItem(x, y, z, stack);
+			if (entityPlayer.getGamemode().consumeBlocks()) {
+				if (stacks != null) {
+					for (ItemStack stack : stacks) {
+						world.dropItem(x, y, z, stack);
+					}
 				}
 			}
 		}
@@ -98,197 +103,303 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 		return true;
 	}
 
-	@Override
-	public boolean onItemUse(ItemStack itemstack, EntityPlayer entityplayer, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
-		// Block counter so we can detect how much fuel to use.
-		int blockCount = 0;
+	private void mineNorthLoop(int blockX, int blockY, int blockZ, int minX, int minY, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX - minX; x < blockX + maxX; x++) {
+			for (y = blockY - minY; y < blockY + maxY; y++) {
+				for (z = blockZ; z > blockZ - maxZ; z--) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
 
+	private void mineEastLoop(int blockX, int blockY, int blockZ, int minY, int minZ, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX; x < blockX + maxX; x++) {
+			for (y = blockY - minY; y < blockY + maxY; y++) {
+				for (z = blockZ - minZ; z < blockZ + maxZ; z++) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
+
+	private void mineSouthLoop(int blockX, int blockY, int blockZ, int minX, int minY, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX - minX; x < blockX + maxX; x++) {
+			for (y = blockY - minY; y < blockY + maxY; y++) {
+				for (z = blockZ; z < blockZ + maxZ; z++) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
+
+	private void mineWestLoop(int blockX, int blockY, int blockZ, int minY, int minZ, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX; x > blockX - maxX; x--) {
+			for (y = blockY - minY; y < blockY + maxY; y++) {
+				for (z = blockZ - minZ; z < blockZ + maxZ; z++) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
+
+	private void mineUpLoop(int blockX, int blockY, int blockZ, int minX, int minZ, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX - minX; x < blockX + maxX; x++) {
+			for (y = blockY; y < blockY + maxY; y++) {
+				for (z = blockZ - minZ; z < blockZ + maxZ; z++) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
+
+	private void mineDownLoop(int blockX, int blockY, int blockZ, int minX, int minZ, int maxX, int maxY, int maxZ, Runnable action) {
+		for (x = blockX - minX; x < blockX + maxX; x++) {
+			for (y = blockY; y > blockY - maxY; y--) {
+				for (z = blockZ - minZ; z < blockZ + maxZ; z++) {
+					if (action != null) {
+						action.run();
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
 		// First check if there's a targeted block exists and is mine-able.
 		// If it exists then play the 'destruct' sound.
 		if (world.getBlock(blockX, blockY, blockZ) != null && world.getBlock(blockX, blockY, blockZ).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
-			world.playSoundAtEntity(entityplayer, "ee.destruct", 0.7f, 1.0f);
+			world.playSoundAtEntity(player, "ee.destruct", 0.7f, 1.0f);
 		}
 		if (!world.isClientSide) {
-			float wrapY = MathHelper.wrapDegrees(Math.round(entityplayer.yRot));
-			float xRot = entityplayer.xRot % 360;
+			// Dummy default values.
+			blockCount = 0;
+			block = world.getBlock(x, y, z);
 
+			// Player rotations.
+			float wrapY = MathHelper.wrapDegrees(Math.round(player.yRot));
+			float xRot = player.xRot % 360;
+
+			// Metadata 1 (half-charge)
 			if (itemstack.getMetadata() == 1) {
 				if (xRot < 60 && xRot > -60) {
 					// North
 					if ((wrapY >= 135 && wrapY < 225)) {
-						for (int x = blockX - 1; x < blockX + 2; x++) {
-							for (int y = blockY - 1; y < blockY + 2; y++) {
-								for (int z = blockZ; z > blockZ - 3; z--) {
-									// Raise the block count per block mined.
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
+						mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
+							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+								++blockCount;
+								block = world.getBlock(x, y, z);
 							}
-						}
+						});
 					}
 					// East
 					else if (wrapY >= 225 && wrapY < 315) {
-						for (int x = blockX; x < blockX + 3; x++) {
-							for (int y = blockY - 1; y < blockY + 2; y++) {
-								for (int z = blockZ - 1; z < blockZ + 2; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
+						mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
+							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+								++blockCount;
+								block = world.getBlock(x, y, z);
 							}
-						}
+						});
 					}
 					// South
 					else if (wrapY >= 315 || wrapY < 45) {
-						for (int x = blockX - 1; x < blockX + 2; x++) {
-							for (int y = blockY - 1; y < blockY + 2; y++) {
-								for (int z = blockZ; z < blockZ + 3; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
+						mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
+							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+								++blockCount;
+								block = world.getBlock(x, y, z);
 							}
-						}
+						});
 					}
 					// West
 					else if (wrapY >= 45 && wrapY < 135) {
-						for (int x = blockX; x > blockX - 3; x--) {
-							for (int y = blockY - 1; y < blockY + 2; y++) {
-								for (int z = blockZ - 1; z < blockZ + 2; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
-							}
-						}
-					}
-				} else if (xRot <= -45) {
-					for (int x = blockX - 1; x < blockX + 2; x++) {
-						for (int y = blockY; y < blockY + 3; y++) {
-							for (int z = blockZ - 1; z < blockZ + 2; z++) {
+						mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
+							if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
 								++blockCount;
-								Block block = world.getBlock(x, y, z);
-
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, entityplayer, x, y, z);
-								}
+								block = world.getBlock(x, y, z);
 							}
-						}
-					}
-				} else if (xRot >= 45) {
-					for (int x = blockX - 1; x < blockX + 2; x++) {
-						for (int y = blockY; y > blockY - 3; y--) {
-							for (int z = blockZ - 1; z < blockZ + 2; z++) {
-								++blockCount;
-								Block block = world.getBlock(x, y, z);
-
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, entityplayer, x, y, z);
-								}
-							}
-						}
+						});
 					}
 				}
-			} else if (itemstack.getMetadata() == 0) {
+				// Up
+				else if (xRot <= -45) {
+					mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
+						if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						}
+					});
+				}
+				// Down
+				else if (xRot >= 45) {
+					mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
+						if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						}
+					});
+				}
+
+				if (canUseItem(blockCount, player)) {
+					if (xRot < 60 && xRot > -60) {
+						// North
+						if ((wrapY >= 135 && wrapY < 225)) {
+							mineNorthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+						// East
+						else if (wrapY >= 225 && wrapY < 315) {
+							mineEastLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+						// South
+						else if (wrapY >= 315 || wrapY < 45) {
+							mineSouthLoop(blockX, blockY, blockZ, 1, 1, 2, 2, 3, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+						// West
+						else if (wrapY >= 45 && wrapY < 135) {
+							mineWestLoop(blockX, blockY, blockZ, 1, 1, 3, 2, 2, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+					}
+					// Up
+					else if (xRot <= -45) {
+						mineUpLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+								dropItems(world, player, x, y, z);
+							}
+						});
+					}
+					// Down
+					else if (xRot >= 45) {
+						mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, () -> {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+								dropItems(world, player, x, y, z);
+							}
+						});
+					}
+				}
+				return true;
+			}
+			// Metadata 0 (full charge)
+			else if (itemstack.getMetadata() == 0) {
 				if (xRot < 60 && xRot > -60) {
 					// North
 					if ((wrapY >= 135 && wrapY < 225)) {
-						for (int x = blockX - 2; x < blockX + 3; x++) {
-							for (int y = blockY - 2; y < blockY + 3; y++) {
-								for (int z = blockZ; z > blockZ - 5; z--) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
-							}
-						}
+						mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						});
 					}
 					// East
 					else if (wrapY >= 225 && wrapY < 315) {
-						for (int x = blockX; x < blockX + 5; x++) {
-							for (int y = blockY - 2; y < blockY + 3; y++) {
-								for (int z = blockZ - 2; z < blockZ + 3; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
-							}
-						}
+						mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						});
 					}
 					// South
 					else if (wrapY >= 315 || wrapY < 45) {
-						for (int x = blockX - 2; x < blockX + 3; x++) {
-							for (int y = blockY - 2; y < blockY + 3; y++) {
-								for (int z = blockZ; z < blockZ + 5; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
-								}
-							}
-						}
+						mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						});
 					}
 					// West
 					else if (wrapY >= 45 && wrapY < 135) {
-						for (int x = blockX; x > blockX - 5; x--) {
-							for (int y = blockY - 2; y < blockY + 3; y++) {
-								for (int z = blockZ - 2; z < blockZ + 3; z++) {
-									++blockCount;
-									Block block = world.getBlock(x, y, z);
-
-									if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-										dropItems(world, entityplayer, x, y, z);
-									}
+						mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
+							++blockCount;
+							block = world.getBlock(x, y, z);
+						});
+					}
+				}
+				// Up
+				else if (xRot <= -45) {
+					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
+						++blockCount;
+						block = world.getBlock(x, y, z);
+					});
+				}
+				// Down
+				else if (xRot >= 45) {
+					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
+						++blockCount;
+						block = world.getBlock(x, y, z);
+					});
+				}
+				if (canUseItem(blockCount, player)) {
+					if (xRot < 60 && xRot > -60) {
+						// North
+						if ((wrapY >= 135 && wrapY < 225)) {
+							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+									dropItems(world, player, x, y, z);
 								}
-							}
+							});
+						}
+						// East
+						else if (wrapY >= 225 && wrapY < 315) {
+							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+						// South
+						else if (wrapY >= 315 || wrapY < 45) {
+							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+									dropItems(world, player, x, y, z);
+								}
+							});
+						}
+						// West
+						else if (wrapY >= 45 && wrapY < 135) {
+							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, () -> {
+								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+									dropItems(world, player, x, y, z);
+								}
+							});
 						}
 					}
-				} else if (xRot <= -45) {
-					for (int x = blockX - 2; x < blockX + 3; x++) {
-						for (int y = blockY; y < blockY + 5; y++) {
-							for (int z = blockZ - 2; z < blockZ + 3; z++) {
-								++blockCount;
-								Block block = world.getBlock(x, y, z);
-
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, entityplayer, x, y, z);
-								}
+					// Up
+					else if (xRot <= -45) {
+						mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+								dropItems(world, player, x, y, z);
 							}
-						}
+						});
 					}
-				} else if (xRot >= 45) {
-					for (int x = blockX - 2; x < blockX + 3; x++) {
-						for (int y = blockY; y > blockY - 5; y--) {
-							for (int z = blockZ - 2; z < blockZ + 3; z++) {
-								++blockCount;
-								Block block = world.getBlock(x, y, z);
-
-								if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
-									dropItems(world, entityplayer, x, y, z);
-								}
+					// Down
+					else if (xRot >= 45) {
+						mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, () -> {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+								dropItems(world, player, x, y, z);
 							}
-						}
+						});
 					}
 				}
 				return true;

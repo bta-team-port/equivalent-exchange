@@ -1,7 +1,6 @@
 package teamport.ee.miscallaneous;
 
 import net.minecraft.core.item.Item;
-import net.minecraft.core.item.ItemStack;
 import teamport.ee.item.EEItems;
 
 import java.util.HashMap;
@@ -10,7 +9,6 @@ public class FuelEMC {
 	private static final HashMap<Integer, Integer> fuelList = new HashMap<>();
 
 	public FuelEMC() {
-		addFuel(new ItemStack(Item.coal, 1, 1).itemID, 1);
 		addFuel(Item.coal.id, 1);
 		addFuel(Item.dustRedstone.id, 16);
 		addFuel(Item.dustGlowstone.id, 32);

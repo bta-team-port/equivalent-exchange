@@ -5,16 +5,45 @@ import net.minecraft.core.item.ItemStack;
 import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface IToolMatter {
+	FuelEMC fuel = new FuelEMC();
 
 	EnumItemToolModes getCurrentMode();
 
-	default void consumeFuel(int count, ItemStack itemStack, EntityPlayer player) {
-		FuelEMC fuel = new FuelEMC();
-
-		int i = fuel.getYield(itemStack.itemID);
-		if (count == i) {
-			itemStack.consumeItem(player);
+	// First check the entire inventory for EMC fuel items.
+	// If found then get the yield/stack size for the fuel and check if it's above or equal to the counted blocks.
+	// Finally, consume fuel then return true.
+	default boolean canUseItem(int countedBlocks, EntityPlayer player) {
+		if (player != null) {
+			int cumulativeFuel = 0;
+			List<Integer> indices = new ArrayList<>();
+			for (int i = 0; i < player.inventory.mainInventory.length; i++) {
+				ItemStack stack = player.inventory.getStackInSlot(i);
+				if (stack != null && fuel.getFuelList().containsKey(stack.getItem().id)) {
+					cumulativeFuel += fuel.getYield(stack.itemID) * stack.stackSize;
+					indices.add(i);
+					if (cumulativeFuel >= countedBlocks) break;
+				}
+			}
+			if (cumulativeFuel >= countedBlocks) {
+				int usedFuel = 0;
+				for (Integer i : indices) {
+					ItemStack stack = player.inventory.getStackInSlot(i);
+					while (stack.stackSize > 0 && usedFuel < countedBlocks){
+						usedFuel += fuel.getYield(stack.itemID);
+						stack.consumeItem(player);
+					}
+					if (stack.stackSize <= 0){
+						player.inventory.mainInventory[i] = null;
+					}
+				}
+				player.addChatMessage("Block count is " + countedBlocks);
+				return true;
+			}
 		}
+		return false;
 	}
 }
