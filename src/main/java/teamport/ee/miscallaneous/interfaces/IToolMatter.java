@@ -40,7 +40,7 @@ public interface IToolMatter {
 						player.inventory.mainInventory[i] = null;
 					}
 				}
-				player.addChatMessage("Block count is " + countedBlocks);
+				player.addChatMessage("ee.debug.mining" + " " + countedBlocks);
 				return true;
 			}
 		}

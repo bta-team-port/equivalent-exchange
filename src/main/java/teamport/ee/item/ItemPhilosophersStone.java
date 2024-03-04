@@ -19,6 +19,7 @@ public class ItemPhilosophersStone extends Item {
 		setContainerItem(this);
 	}
 
+	// TODO - Sized (3x3x1) transmutation modes.
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
 		// These two are simple. First one checks the block that the player is targeting.

@@ -5,6 +5,8 @@ import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.*;
 import teamport.ee.EEConfig;
 import teamport.ee.item.tools.ItemToolHammer;
+import teamport.ee.item.tools.ItemToolPickaxeMatter;
+import teamport.ee.item.tools.ItemToolShovelMatter;
 import turniplabs.halplibe.helper.ItemHelper;
 
 import static teamport.ee.EquivalentExchange.MOD_ID;
@@ -70,11 +72,11 @@ public class EEItems {
 			"sword_darkmatter.png"
 		);
 		toolShovelDarkMatter = ItemHelper.createItem(MOD_ID,
-			new ItemToolShovel("tool.shovel.darkmatter", nextID(), matDarkMatter),
+			new ItemToolShovelMatter("tool.shovel.darkmatter", nextID(), matDarkMatter),
 			"shovel_darkmatter.png"
 		);
 		toolPickaxeDarkMatter = ItemHelper.createItem(MOD_ID,
-			new ItemToolPickaxe("tool.pickaxe.darkmatter", nextID(), matDarkMatter),
+			new ItemToolPickaxeMatter("tool.pickaxe.darkmatter", nextID(), matDarkMatter),
 			"pickaxe_darkmatter.png"
 		);
 		toolAxeDarkMatter = ItemHelper.createItem(MOD_ID,
