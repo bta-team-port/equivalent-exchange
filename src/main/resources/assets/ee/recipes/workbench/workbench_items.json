@@ -110,6 +110,171 @@
     "name": "equivalent:workbench/dark_matter_hammer",
     "type": "minecraft:crafting/shaped",
     "pattern": [
+      "1",
+      "1",
+      "2"
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.sword.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "1",
+      "2",
+      "2"
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.shovel.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "111",
+      " 2 ",
+      " 2 "
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.pickaxe.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "11 ",
+      "12 ",
+      " 2 "
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.axe.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      "11 ",
+      " 2 ",
+      " 2 "
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.hoe.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_hammer",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
       "121",
       " 2 ",
       " 2 "

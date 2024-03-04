@@ -13,7 +13,6 @@ import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
-import teamport.ee.miscallaneous.math.MathHelper;
 
 public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
@@ -27,7 +26,6 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	public ItemToolHammer(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);
 		setMaxDamage(2);
-		showFullDurability();
 	}
 
 	// A separate function to drop the items, so we don't have to paste it over and over again.
@@ -48,43 +46,37 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 
 	@Override
 	public boolean onBlockDestroyed(World world, ItemStack itemstack, int id, int blockX, int blockY, int blockZ, EntityLiving living) {
-		// Get the block breaker's X and Y rotations.
-		// Shout out to BestSoft for the wrap fix!
-		float wrapY = MathHelper.wrapDegrees(Math.round(living.yRot));
+		Direction playerDirection = Direction.getHorizontalDirection(living);
 		float xRot = living.xRot % 360;
 
-		// ROTATION VALUES
-		// N - 180
-		// E - 270
-		// S - 90
-		// W - 360
+		// 0 - middle
+		// 1 - up
+		// 2 - down
+		if (xRot < 60 && xRot > -60) vertical = 0;
+		else if (xRot <= -45) vertical = 1;
+		else if (xRot >= 45) vertical = 2;
 
-		// Check the current tool mode.
+		// Check the current tool mode. In this case, 3x3 mining mode.
+		// Shout out to UselessBullets for the Direction and Vertical ideas!
 		if (currentToolMode == EnumItemToolModes.THREE_X_THREE) {
-			// Shout out to Hammers by AwesomeBossDJ7 for the modified code!
-			// First check if the miner is looking up and down through the X rotation.
-			// If it isn't; continue to sided directions. Otherwise, skip to the up and down directions at the end.
-			if (xRot < 60 && xRot > -60) {
-				// North and South checks, rotated 45 degrees to both East and South.
-				if ((wrapY >= 135 && wrapY < 225) || (wrapY >= 315 || wrapY < 45)) {
+			if (vertical == 0) {
+				if (playerDirection == Direction.NORTH || playerDirection == Direction.SOUTH) {
 					for (int x = blockX - 1; x < blockX + 2; x++) {
 						for (int y = blockY - 1; y < blockY + 2; y++) {
 							Block block = world.getBlock(x, y, blockZ);
 
-							// Null, mine-able, and bedrock check.
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+							// Null and mine-ability check.
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
 								dropItems(world, (EntityPlayer) living, x, y, blockZ);
 							}
 						}
 					}
-				}
-				// East and South checks are also rotated 45 degrees. This time to North and South.
-				else if ((wrapY >= 225 && wrapY < 315) || (wrapY >= 45 && wrapY < 135)) {
+				} else if (playerDirection == Direction.EAST || playerDirection == Direction.WEST) {
 					for (int z = blockZ - 1; z < blockZ + 2; z++) {
 						for (int y = blockY - 1; y < blockY + 2; y++) {
 							Block block = world.getBlock(blockX, y, z);
 
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
 								dropItems(world, (EntityPlayer) living, blockX, y, z);
 							}
 						}
@@ -104,6 +96,10 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 		}
 		return true;
 	}
+
+	//
+	// The next batch of functions are mining loops for the right-click modes.
+	//
 
 	private void mineNorthLoop(int blockX, int blockY, int blockZ, int minX, int minY, int maxX, int maxY, int maxZ, Runnable action) {
 		for (x = blockX - minX; x < blockX + maxX; x++) {
@@ -184,12 +180,13 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 		if (world.getBlock(blockX, blockY, blockZ) != null && world.getBlock(blockX, blockY, blockZ).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
 			world.playSoundAtEntity(player, "ee.destruct", 0.7f, 1.0f);
 		}
+
 		if (!world.isClientSide) {
 			// Dummy default values.
 			blockCount = 0;
 			block = world.getBlock(x, y, z);
 
-			// Runnable values, so we don't have to paste over and over again!
+			// Runnable values, so we don't have to paste over and over again.
 			// The first function is when to count blocks. The second is when to break them.
 			final Runnable countBlocks = () -> {
 				if (!world.isAirBlock(x, y, z) && world.getBlock(x, y, z).hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
@@ -290,33 +287,33 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 				} else if (vertical == 2) {
 					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
 				}
-			}
 
-			if (canUseItem(blockCount, player)) {
-				if (vertical == 0) {
-					switch (playerDirHorizontal) {
-						default:
-						case NONE:
-						case NORTH:
-							mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
-							break;
-						case EAST:
-							mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
-							break;
-						case SOUTH:
-							mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
-							break;
-						case WEST:
-							mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
-							break;
+				if (canUseItem(blockCount, player)) {
+					if (vertical == 0) {
+						switch (playerDirHorizontal) {
+							default:
+							case NONE:
+							case NORTH:
+								mineNorthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
+								break;
+							case EAST:
+								mineEastLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
+								break;
+							case SOUTH:
+								mineSouthLoop(blockX, blockY, blockZ, 2, 2, 3, 3, 5, breakBlocks);
+								break;
+							case WEST:
+								mineWestLoop(blockX, blockY, blockZ, 2, 2, 5, 3, 3, breakBlocks);
+								break;
+						}
+					} else if (vertical == 1) {
+						mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
+					} else if (vertical == 2) {
+						mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
 					}
-				} else if (vertical == 1) {
-					mineUpLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
-				} else if (vertical == 2) {
-					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, breakBlocks);
 				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
