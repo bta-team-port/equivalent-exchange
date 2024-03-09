@@ -9,6 +9,7 @@ import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.ItemToolHoe;
 import net.minecraft.core.util.helper.Direction;
+import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
@@ -21,6 +22,7 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 
 	public ItemToolHoeMatter(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);
+		setMaxDamage(2);
 	}
 
 	// A separate function to drop the items, so we don't have to paste it over and over again.
@@ -61,7 +63,7 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 							Block block = world.getBlock(x, y, blockZ);
 
 							// Null and mine-ability check.
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_HOE)) {
 								dropItems(world, (EntityPlayer) living, x, y, blockZ);
 							}
 						}
@@ -71,7 +73,7 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 						for (int y = blockY - 1; y < blockY + 2; y++) {
 							Block block = world.getBlock(blockX, y, z);
 
-							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE)) {
+							if (block != null && block.hasTag(BlockTags.MINEABLE_BY_HOE)) {
 								dropItems(world, (EntityPlayer) living, blockX, y, z);
 							}
 						}
@@ -82,7 +84,7 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 					for (int z = blockZ - 1; z < blockZ + 2; z++) {
 						Block block = world.getBlock(x, blockY, z);
 
-						if (block != null && block.hasTag(BlockTags.MINEABLE_BY_PICKAXE) && block != Block.bedrock) {
+						if (block != null && block.hasTag(BlockTags.MINEABLE_BY_HOE)) {
 							dropItems(world, (EntityPlayer) living, x, blockY, z);
 						}
 					}
@@ -90,6 +92,70 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 			}
 		}
 		return true;
+	}
+
+	// Half-charge hoeing function.
+	private void hoeInAreaHalf(int blockX, int blockZ, Runnable runnable) {
+		for (x = blockX - 1; x < blockX + 2; x++) {
+			for (z = blockZ - 1; z < blockZ + 2; z++) {
+				if (runnable != null) {
+					runnable.run();
+				}
+			}
+		}
+	}
+
+	// Full-charge hoeing function.
+	private void hoeInAreaFull(int blockX, int blockZ, Runnable runnable) {
+		for (x = blockX - 2; x < blockX + 3; x++) {
+			for (z = blockZ - 2; z < blockZ + 3; z++) {
+				if (runnable != null) {
+					runnable.run();
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int blockX, int blockY, int blockZ, Side side, double xPlaced, double yPlaced) {
+		if (world.getBlock(blockX, blockY, blockZ) != null) {
+			world.playSoundAtEntity(player, "ee.destruct", 0.7f, 1.0f);
+		}
+
+		if (!world.isClientSide) {
+			// Metadata 1 (half charge)
+			if (itemstack.getMetadata() == 1) {
+				hoeInAreaHalf(blockX, blockZ, () -> {
+					// This gets the blockID of xyz. Then, it checks if the blocks are hoe-able.
+					int id = world.getBlockId(x, blockY, z);
+					boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
+
+
+					if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
+						world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
+					}
+				});
+
+				return true;
+			}
+
+			// Metadata 0 (full charge)
+			else if (itemstack.getMetadata() == 0) {
+				hoeInAreaFull(blockX, blockZ, () -> {
+					int id = world.getBlockId(x, blockY, z);
+					boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
+
+
+					if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
+						world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
+					}
+				});
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

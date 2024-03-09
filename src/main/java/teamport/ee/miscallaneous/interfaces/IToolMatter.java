@@ -2,6 +2,7 @@ package teamport.ee.miscallaneous.interfaces;
 
 import net.minecraft.core.entity.player.EntityPlayer;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.lang.I18n;
 import teamport.ee.miscallaneous.FuelEMC;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 
@@ -40,7 +41,7 @@ public interface IToolMatter {
 						player.inventory.mainInventory[i] = null;
 					}
 				}
-				player.addChatMessage("ee.debug.mining" + " " + countedBlocks);
+				player.addChatMessage(I18n.getInstance().translateKey("ee.debug.mining") + " " + countedBlocks);
 				return true;
 			}
 		}
