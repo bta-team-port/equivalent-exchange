@@ -16,9 +16,8 @@ import teamport.ee.miscallaneous.interfaces.IToolMatter;
 
 public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
-	private int x, y, z;
+	private int x, z;
 	private int vertical;
-	private Block block;
 
 	public ItemToolHoeMatter(String name, int id, ToolMaterial enumtoolmaterial) {
 		super(name, id, enumtoolmaterial);

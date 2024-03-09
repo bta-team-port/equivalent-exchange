@@ -4,10 +4,7 @@ import net.minecraft.core.item.Item;
 import net.minecraft.core.item.material.ToolMaterial;
 import net.minecraft.core.item.tool.*;
 import teamport.ee.EEConfig;
-import teamport.ee.item.tools.ItemToolHammer;
-import teamport.ee.item.tools.ItemToolHoeMatter;
-import teamport.ee.item.tools.ItemToolPickaxeMatter;
-import teamport.ee.item.tools.ItemToolShovelMatter;
+import teamport.ee.item.tools.*;
 import turniplabs.halplibe.helper.ItemHelper;
 
 import static teamport.ee.EquivalentExchange.MOD_ID;
@@ -91,6 +88,10 @@ public class EEItems {
 		toolHammerDarkMatter = ItemHelper.createItem(MOD_ID,
 			new ItemToolHammer("tool.hammer.darkmatter", nextID(), matDarkMatter),
 			"hammer_darkmatter.png"
+		);
+		toolShearsDarkMatter = ItemHelper.createItem(MOD_ID,
+			new ItemToolShearsMatter("tool.shears.darkmatter", nextID()),
+			"shears_darkmatter.png"
 		);
 	}
 }

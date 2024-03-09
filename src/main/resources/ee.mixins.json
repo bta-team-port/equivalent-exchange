@@ -4,6 +4,7 @@
   "package": "teamport.ee.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "EntitySheepMixin"
   ],
   "client": [
     "MinecraftMixin"

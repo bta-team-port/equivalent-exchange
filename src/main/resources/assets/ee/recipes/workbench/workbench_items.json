@@ -303,5 +303,37 @@
       "meta": 2
     },
     "consumeContainers": false
+  },
+  {
+    "name": "equivalent:workbench/dark_matter_shears",
+    "type": "minecraft:crafting/shaped",
+    "pattern": [
+      " 1",
+      "2 "
+    ],
+    "symbols": [
+      {
+        "symbol": "1",
+        "stack": {
+          "key": "item.ee.matter.dark",
+          "amount": 2,
+          "meta": 0
+        }
+      },
+      {
+        "symbol": "2",
+        "stack": {
+          "key": "item.diamond",
+          "amount": 3,
+          "meta": 0
+        }
+      }
+    ],
+    "result": {
+      "key": "item.ee.tool.shears.darkmatter",
+      "amount": 1,
+      "meta": 2
+    },
+    "consumeContainers": false
   }
 ]
