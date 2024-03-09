@@ -16,6 +16,7 @@ import teamport.ee.item.EEItems;
 import teamport.ee.item.tools.ItemToolHammer;
 import teamport.ee.item.tools.ItemToolHoeMatter;
 import teamport.ee.item.tools.ItemToolPickaxeMatter;
+import teamport.ee.item.tools.ItemToolShovelMatter;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 
@@ -97,6 +98,28 @@ public class MinecraftMixin {
 									case THREE_X_THREE:
 										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Default");
 										ItemToolHoeMatter.currentToolMode = EnumItemToolModes.DEFAULT;
+										break;
+								}
+							}
+
+							if (thePlayer.getCurrentEquippedItem().getItem() == EEItems.toolShovelDarkMatter) {
+								switch (toolModes) {
+									default:
+									case DEFAULT:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Three by One Upwards");
+										ItemToolShovelMatter.currentToolMode = EnumItemToolModes.ONE_X_THREE_UPWARD;
+										break;
+									case ONE_X_THREE_UPWARD:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Three by One Sideways");
+										ItemToolShovelMatter.currentToolMode = EnumItemToolModes.ONE_X_THREE_SIDEWAYS;
+										break;
+									case ONE_X_THREE_SIDEWAYS:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Three by One Forwards");
+										ItemToolShovelMatter.currentToolMode = EnumItemToolModes.ONE_X_THREE_FORWARD;
+										break;
+									case ONE_X_THREE_FORWARD:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Default");
+										ItemToolShovelMatter.currentToolMode = EnumItemToolModes.DEFAULT;
 										break;
 								}
 							}

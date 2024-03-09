@@ -11,6 +11,7 @@ import net.minecraft.core.item.tool.ItemToolPickaxe;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import teamport.ee.EEConfig;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 
@@ -237,7 +238,7 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 					mineDownLoop(blockX, blockY, blockZ, 1, 1, 2, 3, 2, countBlocks);
 				}
 
-				if (canUseItem(blockCount, player)) {
+				if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.hammersUseFuel")) {
 					if (vertical == 0) {
 						switch (playerDirHorizontal) {
 							default:
@@ -288,7 +289,7 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 					mineDownLoop(blockX, blockY, blockZ, 2, 2, 3, 5, 3, countBlocks);
 				}
 
-				if (canUseItem(blockCount, player)) {
+				if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.hammersUseFuel")) {
 					if (vertical == 0) {
 						switch (playerDirHorizontal) {
 							default:
@@ -321,5 +322,10 @@ public class ItemToolHammer extends ItemToolPickaxe implements IToolMatter {
 	@Override
 	public EnumItemToolModes getCurrentMode() {
 		return currentToolMode;
+	}
+
+	@Override
+	public boolean hitEntity(ItemStack itemstack, EntityLiving entityliving, EntityLiving entityliving1) {
+		return true;
 	}
 }

@@ -1,6 +1,7 @@
 package teamport.ee.item.tools;
 
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockFlower;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.entity.EntityLiving;
 import net.minecraft.core.entity.player.EntityPlayer;
@@ -11,12 +12,14 @@ import net.minecraft.core.item.tool.ItemToolHoe;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import teamport.ee.EEConfig;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 
 public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
 	private int x, z;
+	private int blockCount;
 	private int vertical;
 
 	public ItemToolHoeMatter(String name, int id, ToolMaterial enumtoolmaterial) {
@@ -94,7 +97,7 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 	}
 
 	// Half-charge hoeing function.
-	private void hoeInAreaHalf(int blockX, int blockZ, Runnable runnable) {
+	private void hoeHalfCharge(int blockX, int blockZ, Runnable runnable) {
 		for (x = blockX - 1; x < blockX + 2; x++) {
 			for (z = blockZ - 1; z < blockZ + 2; z++) {
 				if (runnable != null) {
@@ -105,11 +108,29 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 	}
 
 	// Full-charge hoeing function.
-	private void hoeInAreaFull(int blockX, int blockZ, Runnable runnable) {
+	private void hoeFullCharge(int blockX, int blockZ, Runnable runnable) {
 		for (x = blockX - 2; x < blockX + 3; x++) {
 			for (z = blockZ - 2; z < blockZ + 3; z++) {
 				if (runnable != null) {
 					runnable.run();
+				}
+			}
+		}
+	}
+
+	private void checkAndReplaceWithAir(World world, EntityPlayer player, int blockY) {
+		if (world.getBlock(x, blockY + 1, z) != null) {
+			Block block = world.getBlock(x, blockY + 1, z);
+			if (block instanceof BlockFlower) {
+				ItemStack[] stacks = world.getBlock(x, blockY + 1, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, blockY + 1, z, world.getBlockMetadata(x, blockY + 1, z), world.getBlockTileEntity(x, blockY + 1, z));
+				world.setBlockWithNotify(x, blockY + 1, z, 0);
+
+				if (player.getGamemode().consumeBlocks()) {
+					if (stacks != null) {
+						for (ItemStack stack : stacks) {
+							world.dropItem(x, blockY + 1, z, stack);
+						}
+					}
 				}
 			}
 		}
@@ -122,33 +143,55 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 		}
 
 		if (!world.isClientSide) {
+			// Dummy default values.
+			blockCount = 0;
+
+			// Runnable values, so we don't have to paste over and over again.
+			// The first function is when to count blocks. The second is when to break them.
+			final Runnable countBlocks = () -> {
+				if (!world.isAirBlock(x, blockY, z) && world.isAirBlock(x, blockY + 1, z)) {
+					++blockCount;
+				}
+			};
+
+
 			// Metadata 1 (half charge)
 			if (itemstack.getMetadata() == 1) {
-				hoeInAreaHalf(blockX, blockZ, () -> {
-					// This gets the blockID of xyz. Then, it checks if the blocks are hoe-able.
-					int id = world.getBlockId(x, blockY, z);
-					boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
+				// First count the blocks in the hoe loops.
+				hoeHalfCharge(blockX, blockZ, countBlocks);
 
+				// Now hoe if it has the required fuel.
+				if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.hoesUseFuel")) {
+					hoeHalfCharge(blockX, blockZ, () -> {
+						// This gets the blockID of xyz. Then, it checks if the blocks are hoe-able.
+						int id = world.getBlockId(x, blockY, z);
+						boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
 
-					if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
-						world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
-					}
-				});
+						checkAndReplaceWithAir(world, player, blockY);
+						if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
+							world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
+						}
+					});
+				}
 
 				return true;
 			}
 
 			// Metadata 0 (full charge)
 			else if (itemstack.getMetadata() == 0) {
-				hoeInAreaFull(blockX, blockZ, () -> {
-					int id = world.getBlockId(x, blockY, z);
-					boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
+				hoeFullCharge(blockX, blockZ, countBlocks);
 
+				if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.hoesUseFuel")) {
+					hoeFullCharge(blockX, blockZ, () -> {
+						int id = world.getBlockId(x, blockY, z);
+						boolean blocksAreHoeable = id == Block.grass.id || id == Block.dirt.id || id == Block.pathDirt.id || id == Block.grassRetro.id || id == Block.mud.id;
 
-					if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
-						world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
-					}
-				});
+						checkAndReplaceWithAir(world, player, blockY);
+						if (blocksAreHoeable && world.getBlock(x, blockY + 1, z) == null && id != 0) {
+							world.setBlockWithNotify(x, blockY, z, Block.farmlandDirt.id);
+						}
+					});
+				}
 
 				return true;
 			}
@@ -160,5 +203,10 @@ public class ItemToolHoeMatter extends ItemToolHoe implements IToolMatter {
 	@Override
 	public EnumItemToolModes getCurrentMode() {
 		return currentToolMode;
+	}
+
+	@Override
+	public boolean hitEntity(ItemStack itemstack, EntityLiving entityliving, EntityLiving entityliving1) {
+		return true;
 	}
 }

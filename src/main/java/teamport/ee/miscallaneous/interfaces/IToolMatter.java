@@ -33,11 +33,11 @@ public interface IToolMatter {
 				int usedFuel = 0;
 				for (Integer i : indices) {
 					ItemStack stack = player.inventory.getStackInSlot(i);
-					while (stack.stackSize > 0 && usedFuel < countedBlocks){
+					while (stack.stackSize > 0 && usedFuel < countedBlocks) {
 						usedFuel += fuel.getYield(stack.itemID);
 						stack.consumeItem(player);
 					}
-					if (stack.stackSize <= 0){
+					if (stack.stackSize <= 0) {
 						player.inventory.mainInventory[i] = null;
 					}
 				}
