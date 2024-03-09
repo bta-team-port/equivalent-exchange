@@ -14,6 +14,16 @@ public class EEConfig {
 			.addEntry("blockIDStart", 1575)
 			.addEntry("itemIDStart", 16575);
 
+		properties.addCategory("Tools")
+			.addEntry("swordsUseFuel", true)
+			.addEntry("shovelsUseFUel", true)
+			.addEntry("pickaxesUseFuel", true)
+			.addEntry("hoesUseFuel", true)
+			.addEntry("hammersUseFuel", true)
+			.addEntry("shearsUseFuel", true);
+
+
+
 		cfg = new TomlConfigHandler(MOD_ID, properties);
 	}
 }

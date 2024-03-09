@@ -11,6 +11,7 @@ import net.minecraft.core.item.tool.ItemToolPickaxe;
 import net.minecraft.core.util.helper.Direction;
 import net.minecraft.core.util.helper.Side;
 import net.minecraft.core.world.World;
+import teamport.ee.EEConfig;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatter {
 	public static EnumItemToolModes currentToolMode = EnumItemToolModes.DEFAULT;
 	private int x, y, z;
+	private int blockCount;
 	private int vertical;
 	private Block block;
 	public static List<Block> coalOreBlocks = new ArrayList<>();
@@ -166,28 +168,46 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 
 		// Server-side code.
 		if (!world.isClientSide) {
+			// Dummy value.
+			blockCount = 0;
+
 			Block clickedBlock = world.getBlock(blockX, blockY, blockZ);
 
 			if (itemstack.getMetadata() < 2) {
 				// Check the clicked block ore type. If it matches, then do the runnable code.
 				// This one is for coal.
 				if (coalOreBlocks.contains(clickedBlock)) {
-					// Go through the entire list of coal ore.
+
+					// Block count function.
+					// This has to be separate but in each ore category.
 					for (Block coalOre : coalOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == coalOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					// Check if you have the required fuel, or if the config is disabled.
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+
+						// Now go through the entire list of coal ore.
+						for (Block coalOre : coalOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == coalOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -196,18 +216,28 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 					for (Block ironOre : ironOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == ironOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+						for (Block ironOre : ironOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == ironOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -215,18 +245,28 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 					for (Block goldOre : goldOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == goldOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+						for (Block goldOre : goldOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == goldOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -235,18 +275,28 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 					for (Block redstoneOre : redstoneOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == redstoneOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+						for (Block redstoneOre : redstoneOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == redstoneOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -255,18 +305,28 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 					for (Block lapisOre : lapisOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == lapisOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+						for (Block lapisOre : lapisOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == lapisOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -275,18 +335,28 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 					for (Block diamondOre : diamondOreBlocks) {
 						mineOreInRadius(world, blockX, blockY, blockZ, () -> {
 							if (block != null && block == diamondOre) {
-								ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
-								world.setBlockWithNotify(x, y, z, 0);
+								blockCount++;
+							}
+						});
+					}
 
-								if (player.getGamemode().consumeBlocks()) {
-									if (stacks != null) {
-										for (ItemStack stack : stacks) {
-											world.dropItem(x, y, z, stack);
+					if (canUseItem(blockCount, player) || !EEConfig.cfg.getBoolean("Tools.pickaxesUseFuel")) {
+						for (Block diamondOre : diamondOreBlocks) {
+							mineOreInRadius(world, blockX, blockY, blockZ, () -> {
+								if (block != null && block == diamondOre) {
+									ItemStack[] stacks = world.getBlock(x, y, z).getBreakResult(world, EnumDropCause.PROPER_TOOL, x, y, z, world.getBlockMetadata(x, y, z), world.getBlockTileEntity(x, y, z));
+									world.setBlockWithNotify(x, y, z, 0);
+
+									if (player.getGamemode().consumeBlocks()) {
+										if (stacks != null) {
+											for (ItemStack stack : stacks) {
+												world.dropItem(x, y, z, stack);
+											}
 										}
 									}
 								}
-							}
-						});
+							});
+						}
 					}
 				}
 
@@ -299,6 +369,11 @@ public class ItemToolPickaxeMatter extends ItemToolPickaxe implements IToolMatte
 	@Override
 	public EnumItemToolModes getCurrentMode() {
 		return currentToolMode;
+	}
+
+	@Override
+	public boolean hitEntity(ItemStack itemstack, EntityLiving entityliving, EntityLiving entityliving1) {
+		return true;
 	}
 
 	static {
