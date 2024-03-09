@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import teamport.ee.EquivalentExchange;
 import teamport.ee.item.EEItems;
 import teamport.ee.item.tools.ItemToolHammer;
+import teamport.ee.item.tools.ItemToolHoeMatter;
 import teamport.ee.item.tools.ItemToolPickaxeMatter;
 import teamport.ee.miscallaneous.enums.EnumItemToolModes;
 import teamport.ee.miscallaneous.interfaces.IToolMatter;
@@ -85,6 +86,20 @@ public class MinecraftMixin {
 										break;
 								}
 							}
+
+							if (thePlayer.getCurrentEquippedItem().getItem() == EEItems.toolHoeDarkMatter) {
+								switch (toolModes) {
+									default:
+									case DEFAULT:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Three by Three");
+										ItemToolHoeMatter.currentToolMode = EnumItemToolModes.THREE_X_THREE;
+										break;
+									case THREE_X_THREE:
+										ingameGUI.guiHeldItemTooltip.setString("Mining mode: Default");
+										ItemToolHoeMatter.currentToolMode = EnumItemToolModes.DEFAULT;
+										break;
+								}
+							}
 						}
 					}
 				}
@@ -118,11 +133,11 @@ public class MinecraftMixin {
 
 						// This will print the current charge level to the held item tooltip.
 						if (!thePlayer.isSneaking()) {
-							if (meta == 0) ingameGUI.guiHeldItemTooltip.setString("Current charge: 1");
-							else if (meta == 1) ingameGUI.guiHeldItemTooltip.setString("Current charge: 0");
+							if (meta == 0) ingameGUI.guiHeldItemTooltip.setString("Current charge: 2");
+							else if (meta == 1) ingameGUI.guiHeldItemTooltip.setString("Current charge: 1");
 						} else {
-							if (meta == 2) ingameGUI.guiHeldItemTooltip.setString("Current charge: 1");
-							else if (meta == 1) ingameGUI.guiHeldItemTooltip.setString("Current charge: 2");
+							if (meta == 2) ingameGUI.guiHeldItemTooltip.setString("Current charge: 0");
+							else if (meta == 1) ingameGUI.guiHeldItemTooltip.setString("Current charge: 1");
 						}
 					}
 				}
